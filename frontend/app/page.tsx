@@ -6,36 +6,21 @@ import Task from "./components/Task";
 import { useEffect, useMemo, useState } from "react";
 
 export default function Home() {
-  const tasks: TaskType[] = [
-    {
-      text: "Buy groceries, but how long will this task go? I mean will it be able to handle few line of Groceries like Eggs, milk, bread. What about daily routine of going classes and attending lecture or going to the work?",
-      completed: false,
-      dueDate: "02.07.2026",
-      isDeleted: false,
-      deletedAt: null,
-    },
-    {
-      text: "Buy groceries, but how long will this task go? I mean will it be able to handle few line of Groceries like Eggs, milk, bread. What about daily routine of going classes and attending lecture or going to the work?",
-      completed: false,
-      dueDate: "02.07.2026",
-      isDeleted: false,
-      deletedAt: null,
-    },
-    {
-      text: "What about daily routine of going classes and attending lecture or going to the work?",
-      completed: true,
-      dueDate: "02.07.2026",
-      isDeleted: false,
-      deletedAt: null,
-    },
-    {
-      text: "What about daily routine of going classes and attending lecture or going to the work?",
-      completed: true,
-      dueDate: "02.07.2026",
-      isDeleted: false,
-      deletedAt: null,
-    },
-  ];
+  const [tasks, setTasks] = useState<TaskType[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tasks`, {
+      method: "GET",
+      cache: "no-store",
+      next: { revalidate: 60 },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setTasks(data.data);
+        setLoading(false);
+      });
+  }, []);
 
   const completedTask = useMemo(
     () => tasks.filter((task) => task.completed),
@@ -58,18 +43,29 @@ export default function Home() {
           </p>
         </div>
         <div className="flex-col gap-4 text-base font-medium w-full sm:flex-row">
-          <AddTask />
-          {unCompletedTask.length &&
+          <AddTask setTasks={setTasks}/>
+          {unCompletedTask.length ? (
             unCompletedTask.map((task: TaskType, index) => (
-              <Task task={task} key={index} strike={false} />
-            ))}
-          <h3 className="pl-3 mb-3">Completed ({completedTask.length})</h3>
-          {completedTask.length &&
-            completedTask.map((task: TaskType, index) => (
-              <div key={index}>
-                <Task task={task} strike={true} />
-              </div>
-            ))}
+              <Task task={task} key={index} strike={false} setTasks={setTasks} />
+            ))
+          ) : (
+            <h3 className="pl-3 mb-3 text-red-600">
+              There are no task at the moment!
+            </h3>
+          )}
+          {loading && <h3 className="pl-3 mb-3">Loading...</h3>}
+          {completedTask.length ? (
+            <>
+              <h3 className="pl-3 mb-3">Completed ({completedTask.length})</h3>
+              {completedTask.map((task: TaskType, index) => (
+                <div key={index}>
+                  <Task task={task} strike={true} setTasks={setTasks} />
+                </div>
+              ))}
+            </>
+          ) : (
+            <></>
+          )}
         </div>
       </main>
     </div>

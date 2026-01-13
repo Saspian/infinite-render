@@ -18,19 +18,44 @@ app.get("/health", (req, res) => {
 });
 
 app.get("/tasks", async (req, res) => {
-  const tasks = await Task.find();
-  return res.json({status: "success", data: tasks})
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const { sort = "createdAt", order = "desc" } = req.query;
+    const tasks = await Task.find().sort({ [sort]: order === "asc" ? 1 : -1 });
+    return res.json({status: "success", data: tasks})
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
 })
 
 app.post("/task", async (req, res) => {
+  const { text } = req.body;
+  const d = new Date();
+  const dueDate = d.setDate(d.getDate() + 10);
   const task = await Task.create({
-      text: "Sometext format", 
+      text, 
       completed: false, 
-      dueDate: '02.07.2026', 
+      dueDate, 
       isDeleted: false,  
-      deletedAt: false 
+      deletedAt: null 
   })
   res.json({status: "success", data: task})
+})
+
+app.put("/complete/task/:id", async (req, res) => {
+  const task = await Task.findOneAndUpdate(
+    { _id: req.params.id },
+    { $set: { completed: true }},
+    { new: true }
+  )
+  res.json({status: "success", data: task})
+})
+
+app.delete("/task/:id", async (req, res) => {
+  const task = await Task.findByIdAndDelete(
+    { _id: req.params.id },
+  )
+  res.json({status: "success", data: "Deleted successfully"})
 })
 
 app.listen(PORT, () => {

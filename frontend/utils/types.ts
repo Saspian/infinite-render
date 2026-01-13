@@ -1,9 +1,10 @@
 export interface TaskType {
+  _id: string;
   text: string;
-  completed: boolean;
-  dueDate: string;
-  isDeleted: boolean;
-  deletedAt: boolean | null;
+  completed?: boolean;
+  dueDate?: string;
+  isDeleted?: boolean;
+  deletedAt?: boolean | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
