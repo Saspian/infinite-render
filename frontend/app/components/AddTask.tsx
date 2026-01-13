@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TaskType } from "@/utils/types";
+import { ObjectId } from "bson";
 
 export type ChildProps = { setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; };
 export default function AddTask({setTasks}: ChildProps) {
@@ -25,7 +26,7 @@ export default function AddTask({setTasks}: ChildProps) {
 
   const addTask = () => {
     const taskObj: TaskType = {
-      _id: Math.random().toString(36).slice(2),
+      _id: new ObjectId().toString(),
       text: task,
     };
     setTasks(prev => [taskObj, ...prev])

@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 export default function Home() {
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showCompleted, toggleCompleted] = useState<boolean>(false)
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tasks`, {
@@ -30,6 +31,10 @@ export default function Home() {
     () => tasks.filter((task) => !task.completed),
     [tasks]
   );
+
+  const handleCompletedTask = () => {
+    toggleCompleted(!showCompleted)
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-200 font-sans">
@@ -56,8 +61,8 @@ export default function Home() {
           {loading && <h3 className="pl-3 mb-3">Loading...</h3>}
           {completedTask.length ? (
             <>
-              <h3 className="pl-3 mb-3">Completed ({completedTask.length})</h3>
-              {completedTask.map((task: TaskType, index) => (
+              <h3 className="pl-3 mb-3 cursor-pointer" onClick={handleCompletedTask}>Completed ({completedTask.length})</h3>
+              {showCompleted && completedTask.map((task: TaskType, index) => (
                 <div key={index}>
                   <Task task={task} strike={true} setTasks={setTasks} />
                 </div>

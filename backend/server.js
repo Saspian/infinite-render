@@ -29,10 +29,11 @@ app.get("/tasks", async (req, res) => {
 })
 
 app.post("/task", async (req, res) => {
-  const { text } = req.body;
+  const { text, _id } = req.body;
   const d = new Date();
   const dueDate = d.setDate(d.getDate() + 10);
   const task = await Task.create({
+      _id,
       text, 
       completed: false, 
       dueDate, 
@@ -51,11 +52,28 @@ app.put("/complete/task/:id", async (req, res) => {
   res.json({status: "success", data: task})
 })
 
-app.delete("/task/:id", async (req, res) => {
-  const task = await Task.findByIdAndDelete(
+app.put("/edit/task/:id", async (req, res) => {
+  const { text } = req.body;
+  const task = await Task.findOneAndUpdate(
     { _id: req.params.id },
+    { $set: { text }},
+    { new: true }
   )
-  res.json({status: "success", data: "Deleted successfully"})
+  res.json({status: "success", data: task})
+})
+
+app.delete("/task/:id", async (req, res) => {
+  try {
+    const task = await Task.findByIdAndDelete(
+      { _id: req.params.id },
+    )
+    if(!task) {
+      throw new Error("Task not found")
+    }
+    res.json({status: "success", data: "Deleted successfully"})
+  } catch (err) {
+    res.status(500).json(err);
+  }
 })
 
 app.listen(PORT, () => {
