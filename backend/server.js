@@ -19,7 +19,6 @@ app.get("/health", (req, res) => {
 
 app.get("/tasks", async (req, res) => {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 500));
     const { sort = "createdAt", order = "desc" } = req.query;
     const tasks = await Task.find().sort({ [sort]: order === "asc" ? 1 : -1 });
     return res.json({status: "success", data: tasks})
@@ -44,9 +43,10 @@ app.post("/task", async (req, res) => {
 })
 
 app.put("/complete/task/:id", async (req, res) => {
+  const { completed } = req.body;
   const task = await Task.findOneAndUpdate(
     { _id: req.params.id },
-    { $set: { completed: true }},
+    { $set: { completed }},
     { new: true }
   )
   res.json({status: "success", data: task})

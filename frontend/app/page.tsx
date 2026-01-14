@@ -55,7 +55,7 @@ export default function Home() {
             ))
           ) : (
             <h3 className="pl-3 mb-3 text-red-600">
-              There are no task at the moment!
+              There are no active task at the moment!
             </h3>
           )}
           {loading && <h3 className="pl-3 mb-3">Loading...</h3>}
