@@ -49,7 +49,7 @@ export default function AddTask({setTasks}: ChildProps) {
     <div className="flex w-full items-center justify-between mb-4">
       <input
         type="text"
-        className="task-input bg-gray-100 p-2 rounded-md w-full mr-5"
+        className="task-input bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 animate-slide-up delay-100 p-2 rounded-md w-full mr-5"
         placeholder="What's your plan for today?"
         value={task as string}
         onChange={onTaskChange}
