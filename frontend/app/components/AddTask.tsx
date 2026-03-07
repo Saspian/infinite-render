@@ -4,8 +4,11 @@ import { useState } from "react";
 import { TaskType } from "@/utils/types";
 import { ObjectId } from "bson";
 
-export type ChildProps = { setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; };
-export default function AddTask({setTasks}: ChildProps) {
+export type ChildProps = { 
+  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; 
+  taskLength: number;
+};
+export default function AddTask({setTasks, taskLength}: ChildProps) {
   const [task, setTask] = useState<string>("");
   const [disabled, isDisabled] = useState<boolean>(true);
 
@@ -27,9 +30,11 @@ export default function AddTask({setTasks}: ChildProps) {
   const addTask = () => {
     const taskObj: TaskType = {
       _id: new ObjectId().toString(),
+      order: taskLength + 1,
       text: task,
+      priority: 'low'
     };
-    setTasks(prev => [taskObj, ...prev])
+    setTasks(prev => [...prev, taskObj])
     try {
       fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task`, {
         method: "POST",
@@ -49,7 +54,7 @@ export default function AddTask({setTasks}: ChildProps) {
     <div className="flex w-full items-center justify-between mb-4">
       <input
         type="text"
-        className="task-input bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 animate-slide-up delay-100 p-2 rounded-md w-full mr-5"
+        className="task-input bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 p-2 rounded-md w-full mr-5"
         placeholder="What's your plan for today?"
         value={task as string}
         onChange={onTaskChange}
