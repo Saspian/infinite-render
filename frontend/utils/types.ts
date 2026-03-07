@@ -7,4 +7,8 @@ export interface TaskType {
   deletedAt?: boolean | null;
   createdAt?: Date;
   updatedAt?: Date;
+  order: number;
+  priority: Priority,
 }
+
+export type Priority = 'high' | 'medium' | 'low';

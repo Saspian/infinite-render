@@ -9,11 +9,11 @@ export default function LoginPage({ setLogin }: ChildProps) {
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
-    const isLogged = localStorage.getItem("logged")
+    const isLogged = localStorage.getItem("logged");
     if (isLogged) {
       setLogin(JSON.parse(isLogged));
     }
-  })
+  });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,7 +44,7 @@ export default function LoginPage({ setLogin }: ChildProps) {
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setUsername(e.target.value)
           }
-          className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+          className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 outline-1 focus:outline-none focus:ring-2 focus:ring-gray-400"
           required
         />
 
@@ -55,7 +55,7 @@ export default function LoginPage({ setLogin }: ChildProps) {
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setPassword(e.target.value)
           }
-          className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
+          className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 outline-1 focus:outline-none focus:ring-2 focus:ring-gray-400"
           required
         />
 
