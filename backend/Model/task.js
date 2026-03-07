@@ -5,7 +5,7 @@ const taskSchema = new Schema({
   text: String,
   completed: Boolean,
   dueDate: String,
-  order: Number,
+  order: Number || null,
   priority: {
     type: String,
     enum: ['high', 'medium', 'low'],

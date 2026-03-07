@@ -59,7 +59,7 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
   const handleComplete = () => {
     setTasks((prev) =>
       prev.map((t) =>
-        t._id === task._id ? { ...t, completed: !task.completed } : t,
+        t._id === task._id ? { ...t, completed: !task.completed, order: null } : t,
       ),
     );
     try {
@@ -67,7 +67,7 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/complete/task/${task._id}`,
         {
           method: "PUT",
-          body: JSON.stringify({ completed: !task.completed }),
+          body: JSON.stringify({ completed: !task.completed, order: null }),
           headers: { "Content-Type": "application/json" },
         },
       );

@@ -171,7 +171,7 @@ export default function Home() {
       // Build payload: [{ id, order }]
       const updates = reorderedUncompleted.map((task, index) => ({
         id: task._id,
-        order: index,
+        order: index + 1,
       }));
 
       debounceReorder(updates);

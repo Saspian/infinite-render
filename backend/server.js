@@ -55,10 +55,10 @@ app.post("/task", async (req, res) => {
 
 app.put("/complete/task/:id", async (req, res) => {
   try {
-    const { completed } = req.body;
+    const { completed, order } = req.body;
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id },
-      { $set: { completed } },
+      { $set: { completed, order } },
       { new: true },
     );
     res.json({ status: "success", data: task });

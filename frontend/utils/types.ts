@@ -7,7 +7,7 @@ export interface TaskType {
   deletedAt?: boolean | null;
   createdAt?: Date;
   updatedAt?: Date;
-  order: number;
+  order: number | null;
   priority: Priority,
 }
 
