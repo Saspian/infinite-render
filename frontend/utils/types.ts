@@ -12,3 +12,9 @@ export interface TaskType {
 }
 
 export type Priority = 'high' | 'medium' | 'low';
+
+export const priorityOrder: Record<Priority, number> = {
+  high: 1,
+  medium: 2,
+  low: 3
+}

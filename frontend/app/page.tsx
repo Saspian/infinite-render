@@ -1,10 +1,18 @@
 "use client";
 
-import { TaskType } from "@/utils/types";
+import { priorityOrder, TaskType } from "@/utils/types";
 import AddTask from "./components/AddTask";
 import Task from "./components/Task";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Sun, Moon, LogOut, Eye, EyeOff, GripVertical } from "lucide-react";
+import {
+  Sun,
+  Moon,
+  LogOut,
+  Eye,
+  EyeOff,
+  GripVertical,
+  ListFilter,
+} from "lucide-react";
 import LoginPage from "./components/Login";
 import {
   DndContext,
@@ -36,6 +44,7 @@ export default function Home() {
   const [isLoggedIn, toggleLoggedIn] = useState<boolean>(false);
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [open, toggleOpen] = useState<boolean>(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -56,7 +65,6 @@ export default function Home() {
     })
       .then((res) => res.json())
       .then((data) => {
-
         setTasks(data.data);
         setLoading(false);
       });
@@ -178,6 +186,19 @@ export default function Home() {
     },
     [unCompletedTask, completedTask],
   );
+  const handleSortPriority = (order: string) => {
+    if (order === "high2low") {
+      const sortedTasks = [...tasks].sort(
+        (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
+      )
+      setTasks(sortedTasks);
+    } else if (order === "low2high") {
+      const sortedTasks = [...tasks].sort(
+        (a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]
+      )
+      setTasks(sortedTasks);
+    }
+  }
 
   // ────────────────────────────────────────────────────────────────────────────
 
@@ -185,7 +206,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-200 dark:bg-accent text-neutral-900 dark:text-neutral-100 transition-colors duration-300 font-sans">
-      <div className="absolute top-6 right-6 w-[15%] flex justify-between items-center flex-row-reverse">
+      <div className="absolute top-6 right-6 w-[6%] flex justify-between items-center flex-row-reverse">
         <button
           onClick={toggleTheme}
           className="p-3 rounded-full bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
@@ -207,37 +228,61 @@ export default function Home() {
             <LogOut className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
           </button>
         )}
-
-        {isLoggedIn && (
-          <button
-            onClick={handleToggleCompleted}
-            className="flex items-center p-3 px-7 rounded-full bg-neutral-100 dark:bg-input hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
-            aria-label="Toggle theme"
-            title={
-              enableCompleted ? "Hide Completed Task" : "Show Completed Task"
-            }
-          >
-            {enableCompleted ? (
-              <EyeOff className="w-5 h-5 mr-2 text-neutral-700 dark:text-neutral-300" />
-            ) : (
-              <Eye className="w-5 h-5 mr-2 text-neutral-700 dark:text-neutral-300" />
-            )}
-            Completed
-          </button>
-        )}
       </div>
 
       {isLoggedIn ? (
         <main className="flex min-h-screen w-full max-w-4xl flex-col items-center py-32 px-16 sm:items-start">
-          <div
-            className={`flex flex-col items-center text-center sm:items-start sm:text-left mb-4`}
-          >
+          <div className="flex flex-col w-full items-center text-center sm:items-start sm:text-left mb-4">
             <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-neutral-100 ">
               Task Manager
             </h1>
-            <p className="max-w-md text-lg leading-8 text-black dark:text-neutral-100">
-              Stay organized and productive with your daily tasks{" "}
-            </p>
+            <div className="relative flex items-center justify-between w-full text-lg leading-8 text-black dark:text-neutral-100">
+              <p>Stay organized and productive with your daily tasks </p>
+              <ListFilter
+                className="mr-6 cursor-pointer text-neutral-600 dark:bg-input dark:text-neutral-100"
+                width={20}
+                height={35}
+                onClick={() => toggleOpen(!open)}
+              />
+              {open && (
+                <div className="text-sm font-medium flex-col items-center justify-evenly absolute right-2 top-10 z-10 overflow-hidden bg-neutral-100 dark:bg-input rounded-md shadow-lg">
+                  <div
+                    className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
+                    aria-label="Toggle theme"
+                    onClick={() => {
+                      handleSortPriority("high2low")
+                      toggleOpen(false);
+                    }}
+                  >
+                    <p>Priority: High to Low</p>
+                  </div>
+                  <div
+                    className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
+                    aria-label="Toggle theme"
+                    onClick={() => {
+                      handleSortPriority("low2high")
+                      toggleOpen(false);
+                    }}
+                  >
+                    <p>Priority: Low to High</p>
+                  </div>
+
+                  <div
+                    className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
+                    aria-label="Toggle theme"
+                    onClick={() => {
+                      handleToggleCompleted();
+                      toggleOpen(false);
+                    }}
+                  >
+                    <p>
+                      {enableCompleted ? "Hide " : "Show "}
+                      Completed
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex-col gap-4 text-base font-medium w-full sm:flex-row">
