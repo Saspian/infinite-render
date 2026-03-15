@@ -136,12 +136,18 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
     setOpen(false);
   });
 
+  const styles = {
+    high: "border-red-300",
+    medium: "border-amber-200",
+    low: "border-green-200",
+  }
+
   return (
     // setNodeRef + style go on the outermost wrapper so the whole row moves
     <div ref={setNodeRef} style={style} className="mb-4">
       <div
         ref={refDiv}
-        className={`relative flex items-center justify-around w-full h-full py-4 pl-3 bg-white text-neutral-900 dark:bg-input dark:text-neutral-100 rounded-lg ${isDel && "border border-red-400"}`}
+        className={`relative flex items-center justify-around w-full h-full py-3 pl-3 bg-white text-neutral-900 dark:bg-input dark:text-neutral-100 rounded-lg border-2 ${styles[task.priority]}`}
       >
         {/* ── Drag handle — only rendered for uncompleted (non-strike) tasks ── */}
         <div className="flex items-center justify-start w-full">
@@ -193,6 +199,7 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
               task.text
             )}
           </div>
+          {/* ── Priority chip ── */}
           <PriorityChip priority={task.priority}/>
         </div>
 

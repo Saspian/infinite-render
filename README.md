@@ -2,6 +2,8 @@
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+[![React Doctor](https://www.react.doctor/share/badge?p=infinite-render&s=98&w=17&f=1)](https://www.react.doctor/share?p=infinite-render&s=98&w=17&f=1)
+
 ## Getting Started
 
 First, run the development server:
