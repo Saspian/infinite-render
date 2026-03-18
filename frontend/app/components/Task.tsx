@@ -136,21 +136,15 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
     setOpen(false);
   });
 
-  const styles = {
-    high: "border-red-300",
-    medium: "border-amber-200",
-    low: "border-green-200",
-  }
-
   return (
     // setNodeRef + style go on the outermost wrapper so the whole row moves
     <div ref={setNodeRef} style={style} className="mb-4">
       <div
         ref={refDiv}
-        className={`relative flex items-center justify-around w-full h-full py-3 pl-3 bg-white text-neutral-900 dark:bg-input dark:text-neutral-100 rounded-lg border-2 ${styles[task.priority]}`}
+        className={`relative flex items-center justify-around w-full h-full py-3 pl-3 bg-white text-neutral-900 dark:bg-input dark:text-neutral-100 rounded-lg border-2`}
       >
         {/* ── Drag handle — only rendered for uncompleted (non-strike) tasks ── */}
-        <div className="flex items-center justify-start w-full">
+        <div className="flex items-center justify-between w-full">
           {!strike && (
             <button
               {...attributes}
@@ -239,8 +233,8 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
                 className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
                 aria-label="Toggle theme"
                 onClick={() => {
-                  
-                  togglePChange(true);
+                  toggleDel(false);
+                  togglePChange(!isPChange);
                   setOpen(false);
                 }}
               >
@@ -253,6 +247,7 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
               className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
               aria-label="Toggle theme"
               onClick={() => {
+                togglePChange(false);
                 toggleDel(!isDel);
                 setOpen(false);
               }}
@@ -266,18 +261,18 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
 
       {isDel && (
         <p className="text-right">
-          Are you sure want to delete this task.{" "}
+          Are you sure want to delete this task?{" "}
           <span
-            className="text-green-500 cursor-pointer"
+            className="cursor-pointer px-1 text-xs font-bold rounded-sm uppercase border bg-green-100 text-green-700 border-green-300 mx-2"
             onClick={handleDelete}
           >
-            ✅ Yes
+            Yes
           </span>{" "}
           <span
-            className="text-red-500 cursor-pointer"
+            className="cursor-pointer px-1 text-xs font-bold rounded-sm uppercase border bg-red-100 text-red-700 border-red-300"
             onClick={() => toggleDel(false)}
           >
-            ❌ No
+            No
           </span>
         </p>
       )}
@@ -286,19 +281,19 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
         <p className="text-right">
           Select the new priority{" "}
           <span
-            className="cursor-pointer text-xs px-4 rounded-full border bg-red-100 text-red-700 border-red-300"
+            className="cursor-pointer px-1 ml-2 text-[0.70rem] font-bold rounded-sm uppercase border bg-red-100 text-red-700 border-red-300"
             onClick={() => handlePriorityChange('high')}
           >
            High
           </span>{" "}
           <span
-            className="cursor-pointer text-xs px-4 rounded-full border bg-amber-100 text-amber-700 border-amber-300"
+            className="cursor-pointer px-1 ml-2 text-[0.70rem] font-bold rounded-sm uppercase border bg-amber-100 text-amber-700 border-amber-300"
             onClick={() => handlePriorityChange('medium')}
           >
             Medium 
           </span>{" "}
           <span
-            className="cursor-pointer text-xs px-4 rounded-full border bg-green-100 text-green-700 border-green-300"
+            className="cursor-pointer px-1 ml-2 text-[0.70rem] font-bold rounded-sm uppercase border bg-green-100 text-green-700 border-green-300"
             onClick={() => handlePriorityChange('low')}
           >
             Low

@@ -8,16 +8,16 @@ type Props = {
 
 export default function PriorityChip({ priority }: Props) {
   const styles = {
-    high: "bg-red-100 text-red-700 border-red-300",
-    medium: "bg-amber-100 text-amber-700 border-amber-300",
-    low: "bg-green-100 text-green-700 border-green-300",
+    high: "bg-red-50 text-red-700 border-red-300",
+    medium: "bg-amber-50 text-amber-700 border-amber-300",
+    low: "bg-green-50 text-green-700 border-green-300",
   }
 
   return (
     <span
-      className={`px-2 py-0.5 ml-2 text-xs font-medium rounded-full border ${styles[priority]}`}
+      className={`px-1 ml-2 text-[0.70rem] font-bold rounded-sm uppercase border ${styles[priority]}`}
     >
-      {priority.charAt(0).toUpperCase() + priority.slice(1)}
+      {priority.charAt(0) + priority.slice(1)}
     </span>
   )
 }
