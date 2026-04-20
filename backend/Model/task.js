@@ -2,6 +2,10 @@ import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
 const taskSchema = new Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   text: String,
   completed: Boolean,
   dueDate: String,

@@ -3,127 +3,41 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 
+import Task from "./Model/task.js";
+import { userRoute } from "./routes/user.js";
+import { taskRoute } from "./routes/task.js";
+import { authenticate } from "./middleware/protected.js";
+
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
-
-import Task from "./Model/task.js";
 
 app.use(cors());
 app.use(express.json());
 mongoose.connect(process.env.DB);
 
-app.get("/health", (req, res) => {
+// HEALTH API
+app.get("/api/health", (req, res, next) => {
   res.json({ status: "ok" });
 });
 
+// CONSOLE LOGGING
 app.use((req, res, next) => {
-  const now = new Date().toISOString();
-  console.log(`[${now}] ${req.method} ${req.url}`);
-  next(); 
+  res.on("finish", () => {
+    const now = new Date().toISOString();
+    console.log(`[${now}] ${req.method} ${req.url} ${res.statusCode}`);
+  });
+  next();
 });
 
-app.get("/tasks", async (req, res) => {
-  try {
-    const tasks = await Task.find().sort({ order: 1 });
-    return res.json({ status: "success", data: tasks });
-  } catch (err) {
-    res.status(400).json({ err });
-  }
-});
+// MAIN ROUTES
+app.use("/api/user", userRoute);
+app.use("/api/task", authenticate, taskRoute);
 
-app.post("/task", async (req, res) => {
-  try {
-    const { text, order, _id } = req.body;
-    const d = new Date();
-    const dueDate = d.setDate(d.getDate() + 10);
-    const task = await Task.create({
-      _id,
-      text,
-      order,
-      priority: "low",
-      completed: false,
-      dueDate,
-      isDeleted: false,
-      deletedAt: null,
-    });
-    res.json({ status: "success", data: task });
-  } catch (err) {
-    res.status(400).json({ err });
-  }
-});
-
-app.put("/complete/task/:id", async (req, res) => {
-  try {
-    const { completed, order } = req.body;
-    const task = await Task.findOneAndUpdate(
-      { _id: req.params.id },
-      { $set: { completed, order } },
-      { new: true },
-    );
-    res.json({ status: "success", data: task });
-  } catch (err) {
-    res.status(400).json({ err });
-  }
-});
-
-app.put("/edit/task/:id", async (req, res) => {
-  const { text } = req.body;
-  try {
-    const task = await Task.findOneAndUpdate(
-      { _id: req.params.id },
-      { $set: { text } },
-      { new: true },
-    );
-    res.json({ status: "success", data: task });
-  } catch (err) {
-    res.status(400).json({ err });
-  }
-});
-
-app.patch("/tasks/reorder", async (req, res) => {
-  const { tasks } = req.body;
-  if (!Array.isArray(tasks) || tasks.length === 0) {
-    return res.status(400).json({ message: "Tasks array is required" });
-  }
-  try {
-    const operations = tasks.map(({ id, order }) => ({
-      updateOne: {
-        filter: { _id: id },
-        update: { $set: { order } },
-      },
-    }));
-    await Task.bulkWrite(operations, { ordered: false });
-    res.json({ status: "success", data: "Reordered successfully" });
-  } catch (err) {
-    res.status(400).json({ err });
-  }
-});
-
-app.put("/task/priority/:id", async (req, res) => {
-  try {
-    const { priority } = req.body;
-    const task = await Task.findOneAndUpdate(
-      { _id: req.params.id },
-      { $set: { priority: priority } },
-      { new: true },
-    );
-    res.json({ status: "success", data: task });
-  } catch (err) {
-    res.status(400).json({ err });
-  }
-});
-
-app.delete("/task/:id", async (req, res) => {
-  try {
-    const task = await Task.findByIdAndDelete({ _id: req.params.id });
-    if (!task) {
-      throw new Error("Task not found");
-    }
-    res.json({ status: "success", data: "Deleted successfully" });
-  } catch (err) {
-    res.status(400).json({ err });
-  }
+// Global error handler
+app.use((err, req, res, next) => {
+  const status = err.status || 400;
+  res.status(status).json({ error: err.message });
 });
 
 app.listen(PORT, () => {
