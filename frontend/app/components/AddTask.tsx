@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { TaskType } from "@/utils/types";
 import { ObjectId } from "bson";
+import { useAuth } from "@/utils/useAuth";
 
-export type ChildProps = { 
-  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>; 
+export type ChildProps = {
+  setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   taskLength: number;
 };
-export default function AddTask({setTasks, taskLength}: ChildProps) {
+export default function AddTask({ setTasks, taskLength }: ChildProps) {
+  const { token } = useAuth({ protected: true });
+
   const [task, setTask] = useState<string>("");
   const [disabled, isDisabled] = useState<boolean>(true);
 
@@ -32,17 +35,20 @@ export default function AddTask({setTasks, taskLength}: ChildProps) {
       _id: new ObjectId().toString(),
       order: taskLength + 1,
       text: task,
-      priority: 'low'
+      priority: "low",
     };
-    setTasks(prev => [...prev, taskObj])
+    setTasks((prev) => [...prev, taskObj]);
     try {
       fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task`, {
         method: "POST",
         body: JSON.stringify(taskObj),
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
     } catch (err) {
-      setTasks(prev => prev.filter(t => t._id !== taskObj._id));
+      setTasks((prev) => prev.filter((t) => t._id !== taskObj._id));
       console.error(err);
     } finally {
       setTask("");

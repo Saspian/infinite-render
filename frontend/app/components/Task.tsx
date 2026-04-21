@@ -13,9 +13,10 @@ import {
   Check,
   Circle,
   CircleCheckBig,
-  CalendarArrowUp
+  CalendarArrowUp,
 } from "lucide-react";
 import PriorityChip from "./PriorityChip";
+import { useAuth } from "@/utils/useAuth";
 
 type ChildProps = {
   task: TaskType;
@@ -24,6 +25,8 @@ type ChildProps = {
 };
 
 export default function Task({ task, strike, setTasks }: ChildProps) {
+  const { token } = useAuth({ protected: true });
+
   const [edit, toggleEdit] = useState<boolean>(false);
   const [text, setText] = useState<string>(task.text);
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -59,7 +62,9 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
   const handleComplete = () => {
     setTasks((prev) =>
       prev.map((t) =>
-        t._id === task._id ? { ...t, completed: !task.completed, order: null } : t,
+        t._id === task._id
+          ? { ...t, completed: !task.completed, order: null }
+          : t,
       ),
     );
     try {
@@ -68,7 +73,10 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
         {
           method: "PUT",
           body: JSON.stringify({ completed: !task.completed, order: null }),
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
       );
     } catch (e) {
@@ -83,6 +91,10 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
     try {
       fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task/${task._id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
     } catch (e) {
       console.error(e);
@@ -98,10 +110,13 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
       prev.map((t) => (t._id === task._id ? { ...t, text } : t)),
     );
     try {
-      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/edit/task/${task._id}`, {
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task/edit/${task._id}`, {
         method: "PUT",
         body: JSON.stringify({ text }),
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
     } catch (err) {
       console.error(err);
@@ -113,9 +128,7 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
   const handlePriorityChange = (priority: Priority) => {
     togglePChange(false);
     setTasks((prev) =>
-      prev.map((t) =>
-        t._id === task._id ? { ...t, priority } : t,
-      ),
+      prev.map((t) => (t._id === task._id ? { ...t, priority } : t)),
     );
     try {
       fetch(
@@ -123,13 +136,16 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
         {
           method: "PUT",
           body: JSON.stringify({ priority }),
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
       );
     } catch (e) {
       console.error(e);
     }
-  }
+  };
 
   useClickOutside(refDiv, () => {
     toggleEdit(false);
@@ -194,7 +210,7 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
             )}
           </div>
           {/* ── Priority chip ── */}
-          <PriorityChip priority={task.priority}/>
+          <PriorityChip priority={task.priority} />
         </div>
 
         {edit ? (
@@ -217,30 +233,30 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
           <div className="flex-col items-center justify-evenly absolute right-2 top-10 z-10 overflow-hidden bg-neutral-100 dark:bg-input rounded-lg shadow-lg">
             {!task.completed && (
               <>
-              <div
-                className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
-                aria-label="Toggle theme"
-                onClick={() => {
-                  toggleEdit(!edit);
-                  toggleDel(false);
-                  setOpen(false);
-                }}
-              >
-                <Pencil className="w-4 h-5 mr-2 text-neutral-700 dark:text-neutral-300" />
-                <p>Edit</p>
-              </div>
-               <div
-                className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
-                aria-label="Toggle theme"
-                onClick={() => {
-                  toggleDel(false);
-                  togglePChange(!isPChange);
-                  setOpen(false);
-                }}
-              >
-                <CalendarArrowUp className="w-4 h-5 mr-2 text-neutral-700 dark:text-neutral-300" />
-                <p>Priority</p>
-              </div>
+                <div
+                  className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
+                  aria-label="Toggle theme"
+                  onClick={() => {
+                    toggleEdit(!edit);
+                    toggleDel(false);
+                    setOpen(false);
+                  }}
+                >
+                  <Pencil className="w-4 h-5 mr-2 text-neutral-700 dark:text-neutral-300" />
+                  <p>Edit</p>
+                </div>
+                <div
+                  className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
+                  aria-label="Toggle theme"
+                  onClick={() => {
+                    toggleDel(false);
+                    togglePChange(!isPChange);
+                    setOpen(false);
+                  }}
+                >
+                  <CalendarArrowUp className="w-4 h-5 mr-2 text-neutral-700 dark:text-neutral-300" />
+                  <p>Priority</p>
+                </div>
               </>
             )}
             <div
@@ -282,19 +298,19 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
           Select the new priority{" "}
           <span
             className="cursor-pointer px-1 ml-2 text-[0.70rem] font-bold rounded-sm uppercase border bg-red-100 text-red-700 border-red-300"
-            onClick={() => handlePriorityChange('high')}
+            onClick={() => handlePriorityChange("high")}
           >
-           High
+            High
           </span>{" "}
           <span
             className="cursor-pointer px-1 ml-2 text-[0.70rem] font-bold rounded-sm uppercase border bg-amber-100 text-amber-700 border-amber-300"
-            onClick={() => handlePriorityChange('medium')}
+            onClick={() => handlePriorityChange("medium")}
           >
-            Medium 
+            Medium
           </span>{" "}
           <span
             className="cursor-pointer px-1 ml-2 text-[0.70rem] font-bold rounded-sm uppercase border bg-green-100 text-green-700 border-green-300"
-            onClick={() => handlePriorityChange('low')}
+            onClick={() => handlePriorityChange("low")}
           >
             Low
           </span>

@@ -26,7 +26,6 @@ router.post("/", async (req, res, next) => {
     // CREATING NEW USER
     const user = new User({
       username: req.body.username,
-      email: req.body.email,
       password: hashedPassword,
       repassword: hashedrePassword,
     });
@@ -78,9 +77,27 @@ router.post("/login", async (req, res, next) => {
       message: "Login successfull",
     };
 
+    res.cookie("session_token", accessToken, {
+      httpOnly: true,
+      secure: true, // Required for SameSite: 'None' or 'Lax' on HTTPS
+      sameSite: "Lax",
+      maxAge: 86400000, // 1 day
+      path: "/",
+      // domain: '.yourdomain.com' // Enable if backend/frontend are on subdomains
+    });
+
     res
       .header({ "auth-token": accessToken, "auth-rtoken": refreshToken })
       .send(dataToSend);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/logout", async (req, res, next) => {
+  try {
+    res.clearCookie("session_token");
+    return res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
     next(err);
   }
