@@ -34,7 +34,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.put("/complete/task/:id", async (req, res, next) => {
+router.put("/complete/:id", async (req, res, next) => {
   try {
     const { completed, order } = req.body;
     const task = await Task.findOneAndUpdate(
