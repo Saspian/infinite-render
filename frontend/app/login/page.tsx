@@ -2,15 +2,15 @@
 
 import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/utils/useAuth";
+import { Sun, Moon } from "lucide-react";
 
 export default function LoginPage() {
-  useAuth({ protected: false })
   const router = useRouter();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
   const [errorMSG, setErrorMSG] = useState<string>("");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     setError(true);
@@ -27,24 +27,45 @@ export default function LoginPage() {
       {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
-          },
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       },
     );
-    const response = await res.json()
+    const response = await res.json();
     if (!res.ok) {
       setError(true);
-      setErrorMSG(response.msg)
-      return
+      setErrorMSG(response.msg);
+      return;
     }
-    localStorage.setItem("loggedIn", JSON.stringify(true))
-    localStorage.setItem("_t", response.token)
-    router.push("/task")
+    localStorage.setItem("loggedIn", JSON.stringify(true));
+    localStorage.setItem("_t", response.token);
+    localStorage.setItem("_id", response.id);
+    router.push("/");
+  };
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+    localStorage.setItem("theme", newTheme);
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-200 dark:bg-accent text-neutral-900 dark:text-neutral-100 transition-colors duration-300 font-sans">
+      <div className="absolute top-6 right-6 w-[6%] flex justify-between items-center flex-row-reverse">
+        <button
+          onClick={toggleTheme}
+          className="p-3 rounded-full bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
+          aria-label="Toggle theme"
+        >
+          {theme === "light" ? (
+            <Moon className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
+          ) : (
+            <Sun className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
+          )}
+        </button>
+      </div>
       <div className="w-full max-w-sm bg-white text-neutral-900 dark:bg-input dark:text-neutral-100 rounded-2xl shadow-lg p-8 animate-slide-up delay-100">
         <h1 className="text-2xl font-semibold text-center mb-6 text-black dark:text-neutral-100">
           Login
@@ -81,9 +102,7 @@ export default function LoginPage() {
           </button>
         </form>
         {error && (
-          <p className="text-red-500 cursor-pointer text-center">
-            {errorMSG}
-          </p>
+          <p className="text-red-500 cursor-pointer text-center">{errorMSG}</p>
         )}
       </div>
     </div>

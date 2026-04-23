@@ -25,7 +25,7 @@ type ChildProps = {
 };
 
 export default function Task({ task, strike, setTasks }: ChildProps) {
-  const { token } = useAuth({ protected: true });
+  const { token } = useAuth();
 
   const [edit, toggleEdit] = useState<boolean>(false);
   const [text, setText] = useState<string>(task.text);
@@ -69,7 +69,7 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
     );
     try {
       fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/complete/task/${task._id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/task/complete/${task._id}`,
         {
           method: "PUT",
           body: JSON.stringify({ completed: !task.completed, order: null }),

@@ -3,17 +3,17 @@
 import { useState } from "react";
 import { TaskType } from "@/utils/types";
 import { ObjectId } from "bson";
-import { useAuth } from "@/utils/useAuth";
 
 export type ChildProps = {
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   taskLength: number;
 };
 export default function AddTask({ setTasks, taskLength }: ChildProps) {
-  const { token } = useAuth({ protected: true });
 
   const [task, setTask] = useState<string>("");
   const [disabled, isDisabled] = useState<boolean>(true);
+
+  const token = localStorage.getItem("_t")
 
   function onTaskChange(event: React.ChangeEvent<HTMLInputElement>) {
     setTask(event.currentTarget.value);
