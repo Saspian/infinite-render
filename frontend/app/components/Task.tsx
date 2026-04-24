@@ -16,16 +16,23 @@ import {
   CalendarArrowUp,
 } from "lucide-react";
 import PriorityChip from "./PriorityChip";
-import { useAuth } from "@/utils/useAuth";
+import { logout } from "@/utils/logout";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 type ChildProps = {
   task: TaskType;
   strike: boolean;
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
+  router: AppRouterInstance;
 };
 
-export default function Task({ task, strike, setTasks }: ChildProps) {
-  const { token } = useAuth();
+export default function Task({ task, strike, setTasks, router }: ChildProps) {
+  const [token] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("_t");
+    }
+    return null;
+  });
 
   const [edit, toggleEdit] = useState<boolean>(false);
   const [text, setText] = useState<string>(task.text);
@@ -59,7 +66,7 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
     ref.current.style.height = ref.current.scrollHeight + "px";
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     setTasks((prev) =>
       prev.map((t) =>
         t._id === task._id
@@ -68,7 +75,7 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
       ),
     );
     try {
-      fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/task/complete/${task._id}`,
         {
           method: "PUT",
@@ -79,23 +86,27 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
           },
         },
       );
+      // status code == 401 | logout
+      logout(response.status, router);
     } catch (e) {
       console.error(e);
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     toggleEdit(false);
     toggleDel(false);
     setTasks((prev) => prev.filter((t) => t._id !== task._id));
     try {
-      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task/${task._id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task/${task._id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
+      // status code == 401 | logout
+      logout(response.status, router);
     } catch (e) {
       console.error(e);
     }
@@ -105,12 +116,12 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
     setText(e.currentTarget.value);
   };
 
-  const submitEdit = () => {
+  const submitEdit = async () => {
     setTasks((prev) =>
       prev.map((t) => (t._id === task._id ? { ...t, text } : t)),
     );
     try {
-      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task/edit/${task._id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task/edit/${task._id}`, {
         method: "PUT",
         body: JSON.stringify({ text }),
         headers: {
@@ -118,6 +129,8 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
           Authorization: `Bearer ${token}`,
         },
       });
+      // status code == 401 | logout
+      logout(response.status, router);
     } catch (err) {
       console.error(err);
     } finally {
@@ -125,13 +138,13 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
     }
   };
 
-  const handlePriorityChange = (priority: Priority) => {
+  const handlePriorityChange = async (priority: Priority) => {
     togglePChange(false);
     setTasks((prev) =>
       prev.map((t) => (t._id === task._id ? { ...t, priority } : t)),
     );
     try {
-      fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/task/priority/${task._id}`,
         {
           method: "PUT",
@@ -142,6 +155,8 @@ export default function Task({ task, strike, setTasks }: ChildProps) {
           },
         },
       );
+      // status code == 401 | logout
+      logout(response.status, router);
     } catch (e) {
       console.error(e);
     }

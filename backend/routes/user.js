@@ -1,3 +1,4 @@
+
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -25,7 +26,7 @@ router.post("/", async (req, res, next) => {
 
     // CREATING NEW USER
     const user = new User({
-      username: req.body.username,
+      username: req.body.username.toLowerCase().trim(),
       password: hashedPassword,
       repassword: hashedrePassword,
     });
@@ -38,19 +39,12 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.get("/", async (req, res, next) => {
-  try {
-    const tasks = await User.find().sort({ order: 1 });
-    return res.json({ status: "success", data: tasks });
-  } catch (err) {
-    next(err);
-  }
-});
-
 router.post("/login", async (req, res, next) => {
   try {
+    const userName = req.body.username.toLowerCase().trim();
+    // req.body.username
     // CHECKING IF USER EMAIL EXIST
-    const user = await User.findOne({ username: req.body.username });
+    const user = await User.findOne({ username: userName });
     if (!user) {
       return res.status(401).send({ msg: "Invalid username or password" });
     }
@@ -106,7 +100,7 @@ router.post("/logout", async (req, res, next) => {
 // GENERATING ACCESS TOKEN
 const generateAccessToken = (user) => {
   return jwt.sign(user, process.env.TOKEN_SECRET, {
-    expiresIn: "5m",
+    expiresIn: "1d",
   });
 };
 

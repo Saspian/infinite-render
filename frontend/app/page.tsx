@@ -3,7 +3,7 @@
 import { priorityOrder, TaskType } from "@/utils/types";
 import AddTask from "@/app/components/AddTask";
 import Task from "@/app/components/Task";
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { Sun, Moon, LogOut, GripVertical, ListFilter } from "lucide-react";
 import {
   DndContext,
@@ -26,7 +26,8 @@ import { useInitialAnimation } from "@/utils/useInitialAnimation";
 import { useDebounce } from "@/utils/useDebounce";
 import { useAuth } from "@/utils/useAuth";
 import { useRouter } from "next/navigation";
-import { clearLocalStorage } from "@/utils/logout";
+import { clearLocalStorage, logout } from "@/utils/logout";
+import { useClickOutside } from "@/utils/useClickOutside";
 
 export default function TaskPage() {
   const router = useRouter();
@@ -37,10 +38,10 @@ export default function TaskPage() {
   const [showCompleted, toggleCompleted] = useState<boolean>(false);
   const [enableCompleted, setToggleCompleted] = useState<boolean>(false);
   const [mounted, setMounted] = useState<boolean>(false);
-  const [isLoggedIn, toggleLoggedIn] = useState<boolean>(false);
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [open, toggleOpen] = useState<boolean>(false);
+  const refDiv = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -52,34 +53,40 @@ export default function TaskPage() {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-  const { token, authenticating } = useAuth();
+  useAuth();
+  const [token] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("_t");
+    }
+    return null;
+  });
 
   async function getTask() {
     try {
-      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task`, {
         method: "GET",
         cache: "no-store",
         next: { revalidate: 60 },
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setTasks(data.data);
-          setLoading(false);
-        });
+      });
+      const resData = await response.json();
+      // status code == 401 | logout
+      logout(response.status, router)
+      if (resData.data) {
+        setTasks(resData.data);
+        setLoading(false);
+      }
     } catch (err) {
-      console.error(err, "@@errror from getting task");
+      console.log("Errror: ", err);
     }
   }
 
   useEffect(() => {
-    if (authenticating) return;
     if (!token || token.length === 0) return;
     const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
     const showCompleted = localStorage.getItem("showCompleted");
-    const loggedStatus = localStorage.getItem("loggedIn");
 
     if (savedTheme) {
       setTheme(savedTheme);
@@ -95,16 +102,13 @@ export default function TaskPage() {
         initialTheme === "dark",
       );
     }
-    if (loggedStatus) {
-      toggleLoggedIn(JSON.parse(loggedStatus));
-    }
     if (showCompleted) {
       setToggleCompleted(JSON.parse(showCompleted));
     }
 
     setMounted(true);
     getTask();
-  }, [authenticating, token]);
+  }, [token]);
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
@@ -134,7 +138,6 @@ export default function TaskPage() {
 
   const handleLogout = () => {
     clearLocalStorage();
-    toggleLoggedIn(false);
     router.push("/login");
   };
 
@@ -156,7 +159,7 @@ export default function TaskPage() {
   const debounceReorder = useDebounce(async (updates) => {
     try {
       setIsSaving(true);
-      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task/reorder`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task/reorder`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -164,6 +167,8 @@ export default function TaskPage() {
         },
         body: JSON.stringify({ tasks: updates }),
       });
+      // status code == 401 | logout
+      logout(response.status, router)
     } catch (err) {
       console.error("Failed to persist order:", err);
       // Roll back on error
@@ -217,6 +222,9 @@ export default function TaskPage() {
   };
 
   // ────────────────────────────────────────────────────────────────────────────
+  useClickOutside(refDiv, () => {
+    toggleOpen(false);
+  });
 
   if (!mounted) return null;
 
@@ -249,7 +257,7 @@ export default function TaskPage() {
           <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-neutral-100 ">
             Task Manager
           </h1>
-          <div className="relative flex items-center justify-between w-full text-lg leading-8 text-black dark:text-neutral-100">
+          <div ref={refDiv} className="relative flex items-center justify-between w-full text-lg leading-8 text-black dark:text-neutral-100">
             <p>Stay organized and productive with your daily tasks </p>
             <ListFilter
               className="mr-6 cursor-pointer text-neutral-600 dark:bg-input dark:text-neutral-100"
@@ -299,7 +307,7 @@ export default function TaskPage() {
         </div>
 
         <div className="flex-col gap-4 text-base font-medium w-full sm:flex-row">
-          <AddTask setTasks={setTasks} taskLength={tasks?.length} />
+          <AddTask setTasks={setTasks} taskLength={tasks?.length} router={router}/>
 
           {/* ── Sortable uncompleted tasks ── */}
           <DndContext
@@ -327,7 +335,7 @@ export default function TaskPage() {
                         !animated ? { animationDelay: `${index * 150}ms` } : {}
                       }
                     >
-                      <Task task={task} strike={false} setTasks={setTasks} />
+                      <Task task={task} strike={false} setTasks={setTasks} router={router}/>
                     </div>
                   ))}
                 </>
@@ -367,7 +375,7 @@ export default function TaskPage() {
               {showCompleted &&
                 completedTask.map((task: TaskType, index: number) => (
                   <div key={index}>
-                    <Task task={task} strike={true} setTasks={setTasks} />
+                    <Task task={task} strike={true} setTasks={setTasks} router={router}/>
                   </div>
                 ))}
             </>
