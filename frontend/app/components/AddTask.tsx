@@ -3,17 +3,19 @@
 import { useState } from "react";
 import { TaskType } from "@/utils/types";
 import { ObjectId } from "bson";
+import { logout } from "@/utils/logout";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export type ChildProps = {
   setTasks: React.Dispatch<React.SetStateAction<TaskType[]>>;
   taskLength: number;
+  router: AppRouterInstance;
 };
-export default function AddTask({ setTasks, taskLength }: ChildProps) {
-
+export default function AddTask({ setTasks, taskLength, router }: ChildProps) {
   const [task, setTask] = useState<string>("");
   const [disabled, isDisabled] = useState<boolean>(true);
 
-  const token = localStorage.getItem("_t")
+  const token = localStorage.getItem("_t");
 
   function onTaskChange(event: React.ChangeEvent<HTMLInputElement>) {
     setTask(event.currentTarget.value);
@@ -30,7 +32,7 @@ export default function AddTask({ setTasks, taskLength }: ChildProps) {
     }
   };
 
-  const addTask = () => {
+  const addTask = async () => {
     const taskObj: TaskType = {
       _id: new ObjectId().toString(),
       order: taskLength + 1,
@@ -39,14 +41,19 @@ export default function AddTask({ setTasks, taskLength }: ChildProps) {
     };
     setTasks((prev) => [...prev, taskObj]);
     try {
-      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task`, {
-        method: "POST",
-        body: JSON.stringify(taskObj),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/task`,
+        {
+          method: "POST",
+          body: JSON.stringify(taskObj),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
+      // status code == 401 | logout
+      logout(response.status, router);
     } catch (err) {
       setTasks((prev) => prev.filter((t) => t._id !== taskObj._id));
       console.error(err);
