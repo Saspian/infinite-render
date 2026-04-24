@@ -229,46 +229,46 @@ export default function TaskPage() {
   if (!mounted) return null;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-200 dark:bg-accent text-neutral-900 dark:text-neutral-100 transition-colors duration-300 font-sans">
-      <div className="absolute top-6 right-6 w-[6%] flex justify-between items-center flex-row-reverse">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-200 dark:bg-accent text-neutral-900 dark:text-neutral-100 transition-colors duration-300 font-sans p-4 sm:p-6">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex gap-2 sm:gap-3">
         <button
           onClick={toggleTheme}
-          className="p-3 rounded-full bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
+          className="p-2 sm:p-3 rounded-full bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
           aria-label="Toggle theme"
         >
           {theme === "light" ? (
-            <Moon className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
+            <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-700 dark:text-neutral-300" />
           ) : (
-            <Sun className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
+            <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-700 dark:text-neutral-300" />
           )}
         </button>
 
         <button
           onClick={handleLogout}
-          className="p-3 rounded-full bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
+          className="p-2 sm:p-3 rounded-full bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
           aria-label="Logout"
         >
-          <LogOut className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
+          <LogOut className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-700 dark:text-neutral-300" />
         </button>
       </div>
 
-      <main className="flex min-h-screen w-full max-w-4xl flex-col items-center py-32 px-16 sm:items-start">
-        <div className="flex flex-col w-full items-center text-center sm:items-start sm:text-left mb-4">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-neutral-100 ">
+      <main className="flex min-h-screen w-full max-w-4xl flex-col items-center py-16 sm:py-32 px-4 sm:px-8 lg:px-16 sm:items-start">
+        <div className="flex flex-col w-full items-center text-center sm:items-start sm:text-left mb-4 sm:mb-6">
+          <h1 className="max-w-xs text-2xl sm:text-3xl font-semibold leading-10 tracking-tight text-black dark:text-neutral-100 ">
             Task Manager
           </h1>
-          <div ref={refDiv} className="relative flex items-center justify-between w-full text-lg leading-8 text-black dark:text-neutral-100">
+          <div ref={refDiv} className="relative flex flex-col sm:flex-row items-center justify-between w-full text-base sm:text-lg leading-8 text-black dark:text-neutral-100 gap-2 sm:gap-0">
             <p>Stay organized and productive with your daily tasks </p>
             <ListFilter
-              className="mr-6 cursor-pointer text-neutral-600 dark:bg-input dark:text-neutral-100"
+              className="cursor-pointer text-neutral-600 dark:bg-input dark:text-neutral-100"
               width={20}
-              height={35}
+              height={24}
               onClick={() => toggleOpen(!open)}
             />
             {open && (
-              <div className="text-sm font-medium flex-col items-center justify-evenly absolute right-2 top-10 z-10 overflow-hidden bg-neutral-100 dark:bg-input rounded-md shadow-lg">
+              <div className="text-xs sm:text-sm font-medium flex flex-col items-center justify-evenly absolute right-0 sm:right-2 top-10 z-10 overflow-hidden bg-neutral-100 dark:bg-input rounded-md shadow-lg w-full sm:w-auto">
                 <div
-                  className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
+                  className="flex items-center justify-start p-3 w-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
                   aria-label="Toggle theme"
                   onClick={() => {
                     handleSortPriority("high2low");
@@ -278,7 +278,7 @@ export default function TaskPage() {
                   <p>Priority: High to Low</p>
                 </div>
                 <div
-                  className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
+                  className="flex items-center justify-start p-3 w-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
                   aria-label="Toggle theme"
                   onClick={() => {
                     handleSortPriority("low2high");
@@ -289,7 +289,7 @@ export default function TaskPage() {
                 </div>
 
                 <div
-                  className="flex items-center justify-start p-3 min-w-25 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
+                  className="flex items-center justify-start p-3 w-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 cursor-pointer"
                   aria-label="Toggle theme"
                   onClick={() => {
                     handleToggleCompleted();
@@ -306,7 +306,7 @@ export default function TaskPage() {
           </div>
         </div>
 
-        <div className="flex-col gap-4 text-base font-medium w-full sm:flex-row">
+        <div className="flex flex-col gap-3 sm:gap-4 text-sm sm:text-base font-medium w-full">
           <AddTask setTasks={setTasks} taskLength={tasks?.length} router={router}/>
 
           {/* ── Sortable uncompleted tasks ── */}
@@ -323,7 +323,7 @@ export default function TaskPage() {
               {unCompletedTask?.length ? (
                 <>
                   {isSaving && (
-                    <p className="text-xs text-neutral-400 pl-3 mb-1">
+                    <p className="text-xs text-neutral-400 pl-2 sm:pl-3 mb-1">
                       Saving order…
                     </p>
                   )}
@@ -340,7 +340,7 @@ export default function TaskPage() {
                   ))}
                 </>
               ) : (
-                <h3 className="pl-3 mb-3 text-red-600">
+                <h3 className="pl-2 sm:pl-3 mb-3 text-red-600 text-sm sm:text-base">
                   There are no active tasks at the moment!
                 </h3>
               )}
@@ -367,7 +367,7 @@ export default function TaskPage() {
           {enableCompleted && completedTask?.length ? (
             <>
               <h3
-                className="pl-3 mt-10 mb-4 cursor-pointer"
+                className="pl-2 sm:pl-3 mt-8 sm:mt-10 mb-3 sm:mb-4 cursor-pointer text-sm sm:text-base"
                 onClick={handleCompletedTask}
               >
                 Completed ({completedTask.length})

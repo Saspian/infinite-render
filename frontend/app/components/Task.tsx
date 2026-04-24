@@ -55,6 +55,7 @@ export default function Task({ task, strike, setTasks, router }: ChildProps) {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    touchAction: 'none',
     // Keep row visible (but faded) in its original slot while ghost is shown
     opacity: isDragging ? 0.4 : 1,
   };

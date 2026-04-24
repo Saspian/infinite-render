@@ -76,7 +76,7 @@ export default function AddTask({ setTasks, taskLength, router }: ChildProps) {
       <input
         type="button"
         value="Add Task"
-        className="add-btn w-28 h-10 rounded-md border-none disabled:bg-gray-500 bg-green-500 hover:bg-green-700 text-white text-base cursor-pointer"
+        className="add-btn text-sm w-28 h-10 rounded-md border-none disabled:bg-gray-500 bg-green-500 hover:bg-green-700 text-white cursor-pointer sm:text-md sm:font-bold"
         disabled={disabled}
         onClick={addTask}
       />
