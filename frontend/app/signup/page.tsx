@@ -71,26 +71,26 @@ export default function SignupPage() {
   if (!mounted) return null;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-200 dark:bg-accent text-neutral-900 dark:text-neutral-100 transition-colors duration-300 font-sans">
-      <div className="absolute top-6 right-6 w-[6%] flex justify-between items-center flex-row-reverse">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-200 dark:bg-accent text-neutral-900 dark:text-neutral-100 transition-colors duration-300 font-sans p-4 sm:p-6">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
         <button
           onClick={toggleTheme}
-          className="p-3 rounded-full bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
+          className="p-2 sm:p-3 rounded-full bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
           aria-label="Toggle theme"
         >
           {theme === "light" ? (
-            <Moon className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
+            <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-700 dark:text-neutral-300" />
           ) : (
-            <Sun className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
+            <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-700 dark:text-neutral-300" />
           )}
         </button>
       </div>
-      <div className="w-full max-w-sm bg-white text-neutral-900 dark:bg-input dark:text-neutral-100 rounded-2xl shadow-lg px-8 pt-8 pb-4 animate-slide-up delay-100">
-        <h1 className="text-2xl font-semibold text-center mb-6 text-black dark:text-neutral-100">
+      <div className="w-full max-w-sm bg-white text-neutral-900 dark:bg-input dark:text-neutral-100 rounded-2xl shadow-lg px-6 sm:px-8 pt-6 sm:pt-8 pb-4 sm:pb-6 animate-slide-up delay-100 mx-auto">
+        <h1 className="text-xl sm:text-2xl font-semibold text-center mb-4 sm:mb-6 text-black dark:text-neutral-100">
           Signup
         </h1>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-4">
           <input
             type="text"
             placeholder="Username"
@@ -100,7 +100,7 @@ export default function SignupPage() {
               setErrorMSG("");
               setUsername(e.target.value);
             }}
-            className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 outline-1 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="w-full border rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 outline-1 focus:outline-none focus:ring-2 focus:ring-gray-400"
             required
           />
 
@@ -114,7 +114,7 @@ export default function SignupPage() {
               setErrorMSG("");
               setPassword(e.target.value);
             }}
-            className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 outline-1 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="w-full border rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 outline-1 focus:outline-none focus:ring-2 focus:ring-gray-400"
             required
           />
 
@@ -128,38 +128,39 @@ export default function SignupPage() {
               setErrorMSG("");
               setRepeatPassword(e.target.value);
             }}
-            className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 outline-1 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="w-full border rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-100 text-neutral-900 dark:bg-input dark:text-neutral-100 outline-1 focus:outline-none focus:ring-2 focus:ring-gray-400"
             required
           />
 
-          <div>
+          <div className="flex items-center gap-2 text-sm sm:text-base">
             <input
               type="checkbox"
               onChange={togglePasswordView}
               checked={showPassword}
-            />{" "}
-            Show password
+              className="cursor-pointer"
+            />
+            <label className="cursor-pointer">Show password</label>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full text-black py-2 rounded-lg transition border-2 border-black hover:bg-black hover:text-white ${loading ? "bg-green-500" : "bg-white cursor-pointer"}`}
+            className={`w-full text-black py-2 text-sm sm:text-base rounded-lg transition border-2 border-black hover:bg-black hover:text-white ${loading ? "bg-green-500" : "bg-white cursor-pointer"}`}
           >
             {loading ? (
-              <div className="flex justify-center align-middle">
-                <Loader className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
+              <div className="flex justify-center items-center">
+                <Loader className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-700 dark:text-neutral-300 animate-spin" />
               </div>
             ) : (
               "Sign Up"
             )}
           </button>
         </form>
-        <p className="mt-2 hover:underline cursor-pointer" onClick={() => router.push("/login")}>
+        <p className="mt-2 sm:mt-3 hover:underline cursor-pointer text-sm sm:text-base text-center" onClick={() => router.push("/login")}>
           Already Signup? Login instead!
         </p>
         {error && (
-          <p className="text-red-500 cursor-pointer text-center my-2">
+          <p className="text-red-500 cursor-pointer text-center my-2 text-sm sm:text-base">
             {errorMSG}
           </p>
         )}
