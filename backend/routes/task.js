@@ -1,26 +1,35 @@
 import express from "express";
 import Task from "../Model/task.js";
+import { decryptTaskText, encryptTaskText, getRawUserKey } from "../utils/utils.js";
+import User from "../Model/user.js";
 
-const router = express.Router()
+const router = express.Router();
 
 router.get("/", async (req, res, next) => {
   try {
+    const rawUserKey = await getRawUserKey(req.user._id);
     const tasks = await Task.find({ userId: req.user._id }).sort({ order: 1 });
-    return res.json({ status: "success", data: tasks });
+    const decryptedTasks = tasks.map((task) => {
+      const taskObj = task.toObject();
+      taskObj.text = decryptTaskText(task.text, rawUserKey);
+      return taskObj;
+    });
+    return res.json({ status: "success", data: decryptedTasks });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
 router.post("/", async (req, res, next) => {
   try {
     const { text, order, _id } = req.body;
+    const rawUserKey = await getRawUserKey(req.user._id);
     const d = new Date();
     const dueDate = d.setDate(d.getDate() + 10);
     const task = await Task.create({
       _id,
       userId: req.user._id,
-      text,
+      text: encryptTaskText(text, rawUserKey),
       order,
       priority: "low",
       completed: false,
@@ -30,7 +39,7 @@ router.post("/", async (req, res, next) => {
     });
     res.json({ status: "success", data: task });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
@@ -44,7 +53,7 @@ router.put("/complete/:id", async (req, res, next) => {
     );
     res.json({ status: "success", data: task });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
@@ -58,14 +67,14 @@ router.put("/edit/:id", async (req, res, next) => {
     );
     res.json({ status: "success", data: task });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
 router.patch("/reorder", async (req, res, next) => {
   const { tasks } = req.body;
   if (!Array.isArray(tasks) || tasks.length === 0) {
-    return next(err)
+    return next(err);
   }
   try {
     const operations = tasks.map(({ id, order }) => ({
@@ -77,7 +86,7 @@ router.patch("/reorder", async (req, res, next) => {
     await Task.bulkWrite(operations, { ordered: false });
     res.json({ status: "success", data: "Reordered successfully" });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
@@ -91,7 +100,7 @@ router.put("/priority/:id", async (req, res, next) => {
     );
     res.json({ status: "success", data: task });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
@@ -103,8 +112,8 @@ router.delete("/:id", async (req, res, next) => {
     }
     res.json({ status: "success", data: "Deleted successfully" });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
-export { router as taskRoute};
+export { router as taskRoute };

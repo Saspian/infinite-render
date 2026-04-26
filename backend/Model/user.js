@@ -18,6 +18,9 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  encKey: {
+    type: String,
+  },
   isDeleted: Boolean,
   deletedAt: Boolean || null,
 }, {
