@@ -210,7 +210,7 @@ export default function Task({ task, strike, setTasks, router }: ChildProps) {
           <div
             className={
               (strike ? "line-through " : "") +
-              "w-[80%] h-full text-neutral-900 dark:bg-input dark:text-neutral-100"
+              "w-[80%] h-full text-neutral-900 dark:bg-input dark:text-neutral-100 wrap-break-word"
             }
           >
             {edit ? (

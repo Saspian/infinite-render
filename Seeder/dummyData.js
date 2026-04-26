@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import Task from "./Model/task.js";
-import { Tasks } from "./Tasks.js";
+import Task from "../Model/task.js";
+import { Tasks } from "../Tasks.js";
+import crypto from "crypto";
 dotenv.config();
-
 
 const DB_URL = process.env.DB;
 
