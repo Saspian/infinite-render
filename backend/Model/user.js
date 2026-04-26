@@ -20,6 +20,7 @@ const userSchema = new Schema({
   },
   encKey: {
     type: String,
+    required: true,
   },
   isDeleted: Boolean,
   deletedAt: Boolean || null,
