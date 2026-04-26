@@ -80,6 +80,8 @@ export default function TaskPage() {
       }
     } catch (err) {
       console.log("Errror: ", err);
+    } finally {
+      setLoading(false);
     }
   }
 
