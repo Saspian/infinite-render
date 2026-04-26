@@ -5,7 +5,7 @@ type UseClickOutsideOptions = {
   eventType?: "pointerdown" | "mousedown" | "click";
 };
 
-export function useClickOutside<T extends HTMLElement>(
+export function useClickOutside<T extends HTMLElement | null>(
   ref: RefObject<T>,
   callback: () => void,
   options?: UseClickOutsideOptions
