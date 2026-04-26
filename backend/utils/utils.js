@@ -6,6 +6,26 @@ dotenv.config();
 
 const MASTER_KEY = process.env.MS_ENCRYPTION_KEY;
 const ALGORITHM = "aes-256-cbc";
+
+export const generateUserEncryptionKey = () => {
+  return crypto.randomBytes(32);
+};
+
+export const encryptWithMasterKey = (bufferKey) => {
+  const iv = crypto.randomBytes(16);
+
+  const cipher = crypto.createCipheriv(
+    ALGORITHM,
+    Buffer.from(MASTER_KEY),
+    iv
+  );
+
+  let encrypted = cipher.update(bufferKey);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+
+  return `${iv.toString("hex")}:${encrypted.toString("hex")}`;
+};
+
 export const decryptWithMasterKey = (encryptedText) => {
   const [ivHex, encryptedData] = encryptedText.split(":");
   const decipher = crypto.createDecipheriv(

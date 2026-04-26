@@ -3,6 +3,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../Model/user.js";
+import { encryptWithMasterKey, generateUserEncryptionKey } from "../utils/utils.js";
 
 const router = express.Router();
 
@@ -23,12 +24,15 @@ router.post("/", async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
     const hashedrePassword = await bcrypt.hash(req.body.repassword, salt);
+    const rawUserKey = generateUserEncryptionKey();
+    const encryptedUserKey = encryptWithMasterKey(rawUserKey);
 
     // CREATING NEW USER
     const user = new User({
       username: req.body.username.toLowerCase().trim(),
       password: hashedPassword,
       repassword: hashedrePassword,
+      encKey: encryptedUserKey,
     });
     const savedUser = await user.save();
     res
