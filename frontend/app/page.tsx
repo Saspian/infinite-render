@@ -41,6 +41,7 @@ export default function TaskPage() {
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [open, toggleOpen] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>("");
   const refDiv = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
@@ -63,17 +64,20 @@ export default function TaskPage() {
 
   async function getTask() {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task`, {
-        method: "GET",
-        cache: "no-store",
-        next: { revalidate: 60 },
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/task`,
+        {
+          method: "GET",
+          cache: "no-store",
+          next: { revalidate: 60 },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       const resData = await response.json();
       // status code == 401 | logout
-      logout(response.status, router)
+      logout(response.status, router);
       if (resData.data) {
         setTasks(resData.data);
         setLoading(false);
@@ -89,6 +93,10 @@ export default function TaskPage() {
     if (!token || token.length === 0) return;
     const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
     const showCompleted = localStorage.getItem("showCompleted");
+    const savedUsername = localStorage.getItem("_u");
+    if (savedUsername) {
+      setUsername(savedUsername);
+    }
 
     if (savedTheme) {
       setTheme(savedTheme);
@@ -161,16 +169,19 @@ export default function TaskPage() {
   const debounceReorder = useDebounce(async (updates) => {
     try {
       setIsSaving(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/task/reorder`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/task/reorder`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ tasks: updates }),
         },
-        body: JSON.stringify({ tasks: updates }),
-      });
+      );
       // status code == 401 | logout
-      logout(response.status, router)
+      logout(response.status, router);
     } catch (err) {
       console.error("Failed to persist order:", err);
       // Roll back on error
@@ -233,6 +244,8 @@ export default function TaskPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-200 dark:bg-accent text-neutral-900 dark:text-neutral-100 transition-colors duration-300 font-sans p-4 sm:p-6">
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex gap-2 sm:gap-3">
+        <h4 className="pt-2.5 pr-4">Hi, {username ? username : "User"}!</h4>
+
         <button
           onClick={toggleTheme}
           className="p-2 sm:p-3 rounded-full bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
@@ -259,7 +272,10 @@ export default function TaskPage() {
           <h1 className="max-w-xs text-2xl sm:text-3xl font-semibold leading-10 tracking-tight text-black dark:text-neutral-100 ">
             Task Manager
           </h1>
-          <div ref={refDiv} className="relative flex flex-col sm:flex-row items-center justify-between w-full text-base sm:text-lg leading-8 text-black dark:text-neutral-100 gap-2 sm:gap-0">
+          <div
+            ref={refDiv}
+            className="relative flex flex-col sm:flex-row items-center justify-between w-full text-base sm:text-lg leading-8 text-black dark:text-neutral-100 gap-2 sm:gap-0"
+          >
             <p>Stay organized and productive with your daily tasks </p>
             <ListFilter
               className="cursor-pointer text-neutral-600 dark:bg-input dark:text-neutral-100"
@@ -309,7 +325,11 @@ export default function TaskPage() {
         </div>
 
         <div className="flex flex-col gap-3 sm:gap-4 text-sm sm:text-base font-medium w-full">
-          <AddTask setTasks={setTasks} taskLength={tasks?.length} router={router}/>
+          <AddTask
+            setTasks={setTasks}
+            taskLength={tasks?.length}
+            router={router}
+          />
 
           {/* ── Sortable uncompleted tasks ── */}
           <DndContext
@@ -337,7 +357,12 @@ export default function TaskPage() {
                         !animated ? { animationDelay: `${index * 150}ms` } : {}
                       }
                     >
-                      <Task task={task} strike={false} setTasks={setTasks} router={router}/>
+                      <Task
+                        task={task}
+                        strike={false}
+                        setTasks={setTasks}
+                        router={router}
+                      />
                     </div>
                   ))}
                 </>
@@ -377,7 +402,12 @@ export default function TaskPage() {
               {showCompleted &&
                 completedTask.map((task: TaskType, index: number) => (
                   <div key={index}>
-                    <Task task={task} strike={true} setTasks={setTasks} router={router}/>
+                    <Task
+                      task={task}
+                      strike={true}
+                      setTasks={setTasks}
+                      router={router}
+                    />
                   </div>
                 ))}
             </>

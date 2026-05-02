@@ -39,6 +39,7 @@ export default function SignupPage() {
     if (res.ok) {
       localStorage.setItem("loggedIn", JSON.stringify(true));
       localStorage.setItem("_t", response.token);
+      localStorage.setItem("_u", response.username);
       localStorage.setItem("_id", response.id);
       setLoading(false);
       router.push("/login");
