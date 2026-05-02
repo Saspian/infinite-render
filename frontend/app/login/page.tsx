@@ -40,6 +40,7 @@ export default function LoginPage() {
     if (res.ok) {
       localStorage.setItem("loggedIn", JSON.stringify(true));
       localStorage.setItem("_t", response.token);
+      localStorage.setItem("_u", response.username);
       localStorage.setItem("_id", response.id);
       setLoading(false);
       router.push("/");

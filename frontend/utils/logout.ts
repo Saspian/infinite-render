@@ -10,6 +10,7 @@ export function logout(statusCode: number, router: AppRouterInstance) {
 
 export function clearLocalStorage() {
   localStorage.removeItem("_t");
+  localStorage.removeItem("_u");
   localStorage.removeItem("_id");
   localStorage.removeItem("loggedIn");
   localStorage.removeItem("showCompleted");
