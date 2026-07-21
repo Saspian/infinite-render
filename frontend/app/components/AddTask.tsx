@@ -18,12 +18,12 @@ export default function AddTask({ setTasks, taskLength, router }: ChildProps) {
   const token = localStorage.getItem("_t");
 
   function onTaskChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setTask(event.currentTarget.value);
     if (event.currentTarget.value.length) {
       isDisabled(false);
     } else {
       isDisabled(true);
     }
+    setTask(event.currentTarget.value);
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -33,6 +33,7 @@ export default function AddTask({ setTasks, taskLength, router }: ChildProps) {
   };
 
   const addTask = async () => {
+    isDisabled(true);
     const taskObj: TaskType = {
       _id: new ObjectId().toString(),
       order: taskLength + 1,
@@ -59,7 +60,6 @@ export default function AddTask({ setTasks, taskLength, router }: ChildProps) {
       console.error(err);
     } finally {
       setTask("");
-      isDisabled(true);
     }
   };
 

@@ -366,6 +366,8 @@ export default function TaskPage() {
                     </div>
                   ))}
                 </>
+              ) : loading ? (
+                <h3 className="pl-3 mb-3">Loading...</h3>
               ) : (
                 <h3 className="pl-2 sm:pl-3 mb-3 text-red-600 text-sm sm:text-base">
                   There are no active tasks at the moment!
@@ -387,8 +389,6 @@ export default function TaskPage() {
               )}
             </DragOverlay>
           </DndContext>
-
-          {loading && <h3 className="pl-3 mb-3">Loading...</h3>}
 
           {/* ── Completed tasks (not sortable) ── */}
           {enableCompleted && completedTask?.length ? (
